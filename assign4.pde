@@ -35,6 +35,10 @@ final int PLAYER_MAX_HEALTH = 5;
 int playerMoveDirection = 0;
 int playerMoveTimer = 0;
 int playerMoveDuration = 15;
+int ONE_BLOCK = 80;
+int [][] black;
+int soldierSpeedX = 1;
+final int SOLDIER_H = 80;
 
 boolean demoMode = false;
 
@@ -98,9 +102,30 @@ void setup() {
 		}
 	}
 
+  black = new int [24][2];
+  for(int i = 0; i < 24; i++){
+    int hole = floor(random(2))+1;
+    for(int j = 0; j < hole; j++){
+      black[i][j] = ceil(random(soilHealth.length));
+    }
+  }
 	// Initialize soidiers and their position
 
+  soldierX = new float[6];
+  soldierY = new float[6];
+  for(int i = 0; i < 6;i++){
+    soldierX[i] = random(width-80);
+    soldierY[i] = floor(random(4));
+  }
+
 	// Initialize cabbages and their position
+
+  cabbageX = new float[6];
+  cabbageY = new float[6];
+  for(int i = 0; i < 6;i++){
+    cabbageX[i] = floor(random(8));
+    cabbageY[i] = floor(random(4));
+  }
 
 }
 
@@ -159,12 +184,101 @@ void draw() {
 				// NOTE: To avoid errors on webpage, you can either use floor(j / 4) or (int)(j / 4) to make sure it's an integer.
 				int areaIndex = floor(j / 4);
 				image(soils[areaIndex][4], i * SOIL_SIZE, j * SOIL_SIZE);
+
+      if(j < 8){
+        for(int f = 0; f <= width; f += 80){
+          image(stones[0][4], j*80, j*80);
+          soilHealth[j][j] = 30;
+        }
+      }
+      if(j >= 8 && j <= 16){
+        for(int f = 0; f <= width; f+= 80){
+          for(int k = j * ONE_BLOCK; k <= 15 * ONE_BLOCK; k += 80){
+            if(int(f / 80 % 4) == 0 || int(f / 80 % 4) == 3){
+              if(int(k / 80 % 4) == 1 || int(k / 80 % 4) == 2){
+                image(stones[0][4], f, k);
+                if(f / 80 < 8){
+                soilHealth[f / 80][k / 80] = 30;
+                }
+              }
+            }
+            if(int(f / 80 % 4) == 1 || int(f / 80 % 4) == 2){
+              if(int(k / 80 % 4) == 0 || int(k / 80 % 4) == 3){
+                image(stones[0][4], f, k);
+                if(f / 80 < 8){
+                soilHealth[f / 80][k / 80] = 30;
+                }
+              }
+            }            
+          }
+        }
+      }
+      if(j >= 16 && j <= 24){
+        for(int f = 0; f <= width; f+= 80){
+          for(int k = j * ONE_BLOCK; k <= 24 * ONE_BLOCK; k += 80){
+            
+              if(int(k / 80 % 3) == 1){
+                if(int(f / 80 % 3) == 1 || int(f / 80 % 3) == 2){
+                image(stones[0][4], f, k);
+                if(f / 80 < 8){
+                soilHealth[f / 80][k / 80] = 30;
+                }
+                if(int(f / 80 % 3) == 2){
+                  image(stones[1][4], f, k);
+                  if(f / 80 < 8){
+                soilHealth[f / 80][k / 80] = 45;
+                }
+                }
+              }
+            }
+              if(int(k / 80 % 3) == 2){
+                if(int(f / 80 % 3) == 0 || int(f / 80 % 3) == 1){
+                image(stones[0][4], f, k);
+                if(f / 80 < 8){
+                soilHealth[f / 80][k / 80] = 30;
+                }
+                if(int(f / 80 % 3) == 1){
+                  image(stones[1][4], f, k);
+                  if(f / 80 < 8){
+                soilHealth[f / 80][k / 80] = 45;
+                }
+                }
+              }
+            }
+              if(int(k / 80 % 3) == 0){
+                if(int(f / 80 % 3) == 0 || int(f / 80 % 3) == 2){
+                image(stones[0][4], f, k);
+                if(f / 80 < 8 && k / 80 < 24){
+                soilHealth[f / 80][k / 80] = 30;
+                }
+                if(int(f / 80 % 3) == 0){
+                  image(stones[1][4], f, k);
+                  if(f / 80 < 8 && k / 80 < 24){
+                soilHealth[f / 80][k / 80] = 45;
+                }
+                }                
+              }
+            }            
+          }
+        }
+      }      
+    }
 				
 			}
-		}
-
+    for(int i = 0; i < 24; i++){
+      for(int j = 0; j < 2; j++){
+        if(i > 0){
+        image(soilEmpty, black[i][j] * 80, i * 80);
+        }
+      }
+    }
+    
 		// Cabbages
 		// > Remember to check if playerHealth is smaller than PLAYER_MAX_HEALTH!
+
+    for(int i = 0; i < 6;i++){
+      image(cabbage,cabbageX[i]*80,cabbageY[i]*80+i*320);
+    }
 
 		// Groundhog
 
@@ -290,6 +404,12 @@ void draw() {
 		// > Remember to recalculate playerCol/playerRow when you reset playerX/playerY!
 		// > Remember to reset the soil under player's original position!
 
+    for(int i = 0; i < 6; i++){
+    soldierX[i] += soldierSpeedX;
+    soldierX[i] = soldierX[i]%(width+80);
+    image(soldier,soldierX[i] - SOLDIER_H,soldierY[i]*80+i*320);
+    }
+
 		// Demo mode: Show the value of soilHealth on each soil
 		// (DO NOT CHANGE THE CODE HERE!)
 
@@ -310,6 +430,13 @@ void draw() {
 		popMatrix();
 
 		// Health UI
+
+    for(int i = 0; i < playerHealth; i++){
+      if(playerHealth >= PLAYER_MAX_HEALTH){
+        playerHealth = PLAYER_MAX_HEALTH;
+      }
+      image(life,10 + 70 * i, 10);
+    }
 
 		break;
 
