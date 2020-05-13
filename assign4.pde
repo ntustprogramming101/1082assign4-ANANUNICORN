@@ -270,7 +270,7 @@ void draw() {
         image(cabbage,cabbageX[i]*80,cabbageY[i]*80+i*320);
         if(playerHealth < PLAYER_MAX_HEALTH){
           if(playerX + GROUNDHOG_H > cabbageX[i]*80 && playerX < cabbageX[i]*80 + GABBAGE_H
-          && playerY > cabbageY[i]*80+i*320 && playerY < cabbageY[i]*80 + i*320 + GABBAGE_H){
+          && playerY + GROUNDHOG_H > cabbageY[i]*80+i*320 && playerY < cabbageY[i]*80 + i*320 + GABBAGE_H){
           cabbageEaten[i] = true;
           playerHealth++;
           break;
